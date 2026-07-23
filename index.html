@@ -39,8 +39,10 @@
       font-size: 18px;
       cursor: pointer;
     }
-    button:hover { background: #c0392b; }
-    .thank-you { display: none; color: #27ae60; font-size: 20px; }  </style>
+    button:disabled { background: #999; cursor: not-allowed; }
+    .thank-you { display: none; color: #27ae60; font-size: 20px; }
+    .loading { display: none; color: #e67e22; font-size: 16px; }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -68,14 +70,15 @@
       </select>
 
       <label>What did you like most?</label>
-      <input type="text" name="best" placeholder="e.g. Jollof Rice, Service..." required>
+      <input type="text" name="best" placeholder="e.g. Jollof Rice, Meat pie, Service..." required>
 
       <label>Any comments or suggestions?</label>
       <textarea name="comment" rows="4" placeholder="Optional"></textarea>
 
-      <button type="submit">Submit Feedback</button>
+      <button type="submit" id="submitBtn">Submit Feedback</button>
     </form>
-
+    
+      <div id="loading" class="loading">Submitting your feedback... Please wait</div>
     <div id="thankYou" class="thank-you">
       <h2>Thank you! ❤️</h2>
       <p>Your feedback helps us serve you better every day.</p>
@@ -84,23 +87,50 @@
 
   <script>
     const form = document.getElementById('feedbackForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loading = document.getElementById('loading');
     const thankYou = document.getElementById('thankYou');
 
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-      
+
+      // Disable button and show loading immediately
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+      loading.style.display = "block";
+  
       const formData = new FormData(form);
       
-      fetch('https://script.google.com/macros/s/AKfycbwjrP7MnLwYlXvGbj5KAvsU9EMUarxvpAK3cVyD7F77cjvEnm8yGq5GtGrSw2nKEzxFRQ/exec', {   // ← Paste your Web App URL here
+      fetch('https://script.google.com/macros/s/AKfycbwjrP7MnLwYlXvGbj5KAvsU9EMUarxvpAK3cVyD7F77cjvEnm8yGq5GtGrSw2nKEzxFRQ/exec', {
         method: 'POST',
         body: formData
       })
       .then(() => {
+        // Success
         form.style.display = 'none';
+        loading.style.display = 'none';
         thankYou.style.display = 'block';
       })
-      .catch(() => alert("Something went wrong. Please try again."));
+     .catch((error) => {
+        console.error(error);
+        alert("Something went wrong. Please try again.");
+        // Reset form so they can try again
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Feedback";
+        loading.style.display = "none";
+      });
     });
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
